@@ -9,8 +9,7 @@
     "func": "./tests/functional/saucelabs.sh",
     "lint": "eslint --cache --ext .js,.jsx . --fix",
     "prepublish": "grunt dist",
-    "prepush": "grunt dist",
-    "test": "grunt cover"
+    "prepush": "grunt dist"
   },
   "repository": {
     "type": "git",

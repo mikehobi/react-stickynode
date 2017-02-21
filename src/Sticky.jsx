@@ -59,7 +59,8 @@ class Sticky extends Component {
             bottomBoundary: Infinity, // The bottom boundary on document
             status: STATUS_ORIGINAL, // The Sticky status
             pos: 0, // Real y-axis offset for rendering position-fixed and position-relative
-            activated: false // once browser info is available after mounted, it becomes true to avoid checksum error
+            activated: false, // once browser info is available after mounted, it becomes true to avoid checksum error
+            enabledTopTransition: false
         };
     }
 
@@ -192,6 +193,17 @@ class Sticky extends Component {
         scrollDelta = ae.scroll.delta;
         this.scrollTop = ae.scroll.top;
         this.update();
+    }
+
+    forceUpdate () {
+        this.setState({enabledTopTransition: true}, () => {
+            this.updateInitialDimension();
+            this.update();
+            // refactor
+            setTimeout(() => {
+                this.setState({enabledTopTransition: false});
+            }, 400)
+        });
     }
 
     /**
@@ -367,7 +379,8 @@ class Sticky extends Component {
         var innerStyle = {
             position: this.state.status === STATUS_FIXED ? 'fixed' : 'relative',
             top: this.state.status === STATUS_FIXED ? '0px' : '',
-            zIndex: this.props.innerZ
+            zIndex: this.props.innerZ,
+            transition: this.state.enabledTopTransition ? this.props.topTransition : ''
         };
         var outerStyle = {};
 
@@ -432,7 +445,8 @@ Sticky.propTypes = {
     innerZ: PropTypes.oneOfType([
         PropTypes.string,
         PropTypes.number
-    ])
+    ]),
+    topTransition: PropTypes.string
 };
 
 Sticky.STATUS_ORIGINAL = STATUS_ORIGINAL;
