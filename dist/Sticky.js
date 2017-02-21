@@ -83,7 +83,8 @@ var Sticky = (function (_Component) {
             bottomBoundary: Infinity, // The bottom boundary on document
             status: STATUS_ORIGINAL, // The Sticky status
             pos: 0, // Real y-axis offset for rendering position-fixed and position-relative
-            activated: false // once browser info is available after mounted, it becomes true to avoid checksum error
+            activated: false, // once browser info is available after mounted, it becomes true to avoid checksum error
+            enabledTopTransition: false
         };
     }
 
@@ -232,6 +233,20 @@ var Sticky = (function (_Component) {
             this.scrollTop = ae.scroll.top;
             this.update();
         }
+    }, {
+        key: 'forceUpdate',
+        value: function forceUpdate() {
+            var _this = this;
+
+            this.setState({ enabledTopTransition: true }, function () {
+                _this.updateInitialDimension();
+                _this.update();
+                // refactor
+                setTimeout(function () {
+                    _this.setState({ enabledTopTransition: false });
+                }, 400);
+            });
+        }
 
         /**
          * Update Sticky position.
@@ -337,7 +352,7 @@ var Sticky = (function (_Component) {
     }, {
         key: 'componentDidUpdate',
         value: function componentDidUpdate(prevProps, prevState) {
-            var _this = this;
+            var _this2 = this;
 
             if (prevState.status !== this.state.status && this.props.onStateChange) {
                 this.props.onStateChange({ status: this.state.status });
@@ -346,12 +361,12 @@ var Sticky = (function (_Component) {
             if (prevProps.enabled !== this.props.enabled) {
                 if (this.props.enabled) {
                     this.setState({ activated: true }, function () {
-                        _this.updateInitialDimension();
-                        _this.update();
+                        _this2.updateInitialDimension();
+                        _this2.update();
                     });
                 } else {
                     this.setState({ activated: false }, function () {
-                        _this.reset();
+                        _this2.reset();
                     });
                 }
             }
@@ -418,7 +433,8 @@ var Sticky = (function (_Component) {
             var innerStyle = {
                 position: this.state.status === STATUS_FIXED ? 'fixed' : 'relative',
                 top: this.state.status === STATUS_FIXED ? '0px' : '',
-                zIndex: this.props.innerZ
+                zIndex: this.props.innerZ,
+                transition: this.state.enabledTopTransition ? this.props.topTransition : ''
             };
             var outerStyle = {};
 
@@ -478,7 +494,8 @@ Sticky.propTypes = {
     releasedClass: _react.PropTypes.string,
     onStateChange: _react.PropTypes.func,
     shouldFreeze: _react.PropTypes.func,
-    innerZ: _react.PropTypes.oneOfType([_react.PropTypes.string, _react.PropTypes.number])
+    innerZ: _react.PropTypes.oneOfType([_react.PropTypes.string, _react.PropTypes.number]),
+    topTransition: _react.PropTypes.string
 };
 
 Sticky.STATUS_ORIGINAL = STATUS_ORIGINAL;
