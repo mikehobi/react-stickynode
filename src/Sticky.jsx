@@ -35,6 +35,7 @@ class Sticky extends Component {
         this.handleResize = this.handleResize.bind(this);
         this.handleScroll = this.handleScroll.bind(this);
         this.handleScrollStart = this.handleScrollStart.bind(this);
+        this.update = this.update.bind(this);
         this.delta = 0;
         this.stickyTop = 0;
         this.stickyBottom = 0;
